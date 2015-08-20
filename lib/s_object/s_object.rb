@@ -239,9 +239,9 @@ module SObject
 
     # The Salsforce client.
     def self.client
-      oauth_token = Rails.cache.read('salesforce_oauth_token')
-      force_client = oauth_token.blank? ? Restforce.new : Restforce.new(oauth_token: oauth_token)
-      Rails.cache.write('salesforce_oauth_token', force_client.options[:oauth_token])
+      oauth_token = ::SObject.configuration.salesforce_oauth_token.call()
+      force_client = oauth_token.blank? ? Restforce.new(oauth_token: oauth_token) : nil
+      raise RuntimeError("Unable to establish Restforce client") if force_client.nil?
       force_client
     end
 
