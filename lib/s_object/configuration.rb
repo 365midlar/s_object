@@ -5,7 +5,7 @@ module SObject
 
     def initialize
       @salesforce_namespace = ''
-      @salesforce_oauth_token = -> { '' }
+      @salesforce_client = -> { Restforce.new }
     end
   end
 end
