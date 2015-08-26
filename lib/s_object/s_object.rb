@@ -1,11 +1,11 @@
 module SObject
   # This class is inherited by objects which will reflect a given Salesforce object. Defined using DSL methods you can configure which Salesforce object, fields, and relationships are reflected.
   class SObject
-    class << self; attr_accessor :sobject_name end
+    class << self; attr_accessor :s_object_name end
 
     def initialize(*args)
       # make sure we have a valid object name
-      raise RuntimeError.new('SObject does not define an object name') if self.class.sobject_name.blank?
+      raise RuntimeError.new('SObject does not define an object name') if self.class.s_object_name.blank?
 
       values = args.first
       options = args.second
@@ -42,12 +42,12 @@ module SObject
 
     # Update this record in salesforce using the values in this record
     def update
-      self.class.client.update!(self.class.sobject_name, remote_attributes) ? self : nil
+      self.class.client.update!(self.class.s_object_name, remote_attributes) ? self : nil
     end
 
     # Create a new record in salesforce using the values in this record
     def create
-      external_id = self.class.client.create!(self.class.sobject_name, remote_attributes)
+      external_id = self.class.client.create!(self.class.s_object_name, remote_attributes)
       external_id.blank? ? nil : self.class.find(external_id)
     end
 
@@ -75,10 +75,10 @@ module SObject
     # @param options [Hash] The options hash.
     # @option options [Boolean] :custom If this is +true+, then +__c+ will be added to the name, unless it's already been added.
     def self.maps_object(name, options={})
-      self.sobject_name = "#{name}"
+      self.s_object_name = "#{name}"
 
       if options[:custom]
-        self.class.sobject_name = "#{self.sobject_name}__c"
+        self.class.s_object_name = "#{self.s_object_name}__c"
       end
     end
 
@@ -142,10 +142,10 @@ module SObject
     # @param local [Symbol] The name of the instance variable which references the related obejcts.
     # @param options [Hash] The options hash.
     # @option options [Symbol] :class The name of the child class object. Defaults to +:"#{local.to_s.singularize.capitalize}SObject"+, e.g. +ContactSObject+.
-    # @option options [Symbol] :foreign_key The name of the foreign key instance variable on the related object. Defaults to +:"#{self.class.sobject_name.underscore}_id"+, e.g. +account_id+.
+    # @option options [Symbol] :foreign_key The name of the foreign key instance variable on the related object. Defaults to +:"#{self.class.s_object_name.underscore}_id"+, e.g. +account_id+.
     def self.maps_children(local, options={})
       class_name = options.fetch(:class) { :"#{local.to_s.singularize.capitalize}SObject" }
-      local_id = options.fetch(:foreign_key) { :"#{sobject_name.underscore}_id" }
+      local_id = options.fetch(:foreign_key) { :"#{s_object_name.underscore}_id" }
 
       define_method(local) do
         id_value = self.send(:external_id)
@@ -197,7 +197,7 @@ module SObject
     # Find a record in Salesforce.
     # @param external_id [String] The record Id in Salesforce.
     def self.find(external_id)
-      self.new(client.find(sobject_name, external_id).to_h.symbolize_keys, { translate: true })
+      self.new(client.find(s_object_name, external_id).to_h.symbolize_keys, { translate: true })
     end
 
     # Find a record in Salesforce which satisfy the given conditions.
@@ -210,7 +210,7 @@ module SObject
     # @param conditions [Hash] The query conditions, where the keys are local field names and the values the constraints.
     def self.where(conditions={})
       client.query("SELECT #{remote_fields.keys.join(',')}
-                    FROM #{sobject_name}
+                    FROM #{s_object_name}
                     #{"WHERE #{where_conditions(conditions)}" unless conditions.blank?}")
       .map do |obj|
         self.new(obj.to_h.symbolize_keys, { translate: true })
@@ -219,7 +219,7 @@ module SObject
 
     def self.exists?(conditions={})
       client.query("SELECT Id
-                    FROM #{sobject_name}
+                    FROM #{s_object_name}
                     #{"WHERE #{where_conditions(conditions)}" unless conditions.blank?}
                     LIMIT 1")
       .map do |obj|
@@ -283,7 +283,7 @@ module SObject
       conditions = []
       args.map do |k,v|
         unless local_fields.keys.include?(k)
-          raise ArgumentError.new("'#{k}' is not an attribute of #{sobject_name}")
+          raise ArgumentError.new("'#{k}' is not an attribute of #{s_object_name}")
         end
         conditions << "#{remote_fields.invert[k]} = '#{v}'" if k
       end
