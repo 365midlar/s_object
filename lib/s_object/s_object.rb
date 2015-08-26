@@ -239,8 +239,8 @@ module SObject
 
     # The Salsforce client.
     def self.client
-      force_client = ::SObject.configuration.salesforce_client
-      raise RuntimeError("No Restforce client configured") if force_client.nil?
+      force_client = ::SObject.configuration.salesforce_client.call()
+      raise RuntimeError("Unable to establish Restforce client") if force_client.nil?
       force_client
     end
 
