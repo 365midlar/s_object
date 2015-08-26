@@ -47,6 +47,12 @@ class SObjectTest < Minitest::Test
     assert_equal TestObject.new(attributes).attributes, attributes
   end
 
+  def test_field_assignment
+    attributes = { external_id: 'somefakeid', my_field1: 'foo', my_field2: 'bar' }
+    obj = TestObject.new(attributes)
+    assert_equal attributes, obj.attributes
+  end
+
   # saving
 
   def test_field_translation_when_creating_from_remote_source

@@ -44,7 +44,7 @@ module SObject
 
     def assign_attributes(attributes={})
       attributes.each do |k,v|
-        attributes.send(k, v) if self.class.local_fields.keys.include?(k)
+        send(:"#{k}=", v) if self.class.local_fields.keys.include?(k)
       end
     end
 
