@@ -20,7 +20,21 @@ module SObject
 
     # Saves this record to salesforce
     def save
-      new_record? ? create : update
+      if new_record?
+        self.external_id = self.class.client.create(self.class.s_object_name, remote_attributes)
+        return !self.external_id.blank?
+      else
+        return self.class.client.update(self.class.s_object_name, remote_attributes)
+      end
+    end
+
+    def save!
+      if new_record?
+        self.external_id = self.class.client.create!(self.class.s_object_name, remote_attributes)
+        return !self.external_id.blank?
+      else
+        self.class.client.update!(self.class.s_object_name, remote_attributes)
+      end
     end
 
     # Checks if this record has been saved to salesforce or not
@@ -28,27 +42,35 @@ module SObject
       external_id.blank?
     end
 
-    # Update the values of the instance variables in local_fields
-    def update_attributes(attributes={})
+    def assign_attributes(attributes={})
       attributes.each do |k,v|
         attributes.send(k, v) if self.class.local_fields.keys.include?(k)
       end
     end
 
-    # Update the values of the instance variables in local_fields
-    def update_attributes!(attributes={})
-      update_attributes(attributes)
+    # Update this record in salesforce using the values in this record but throws an exception if save is unsuccessful
+    def update(attributes={})
+      assign_attributes(attributes)
+      save
     end
 
-    # Update this record in salesforce using the values in this record
-    def update
-      self.class.client.update!(self.class.s_object_name, remote_attributes) ? self : nil
+    # Update the values of the instance variables in local_fields and return false if save fails
+    def update!(attributes={})
+      assign_attributes(attributes)
+      save!
     end
 
     # Create a new record in salesforce using the values in this record
-    def create
-      external_id = self.class.client.create!(self.class.s_object_name, remote_attributes)
-      external_id.blank? ? nil : self.class.find(external_id)
+    def self.create(attributes={})
+      object = new(attributes)
+      object.save
+      object
+    end
+
+    def self.create!(attributes={})
+      object = new(attributes)
+      object.save!
+      object
     end
 
     # Get a hash of the values with the salesforce field names as keys

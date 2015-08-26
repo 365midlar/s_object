@@ -49,18 +49,6 @@ class SObjectTest < Minitest::Test
 
   # saving
 
-  def test_update_on_saving_existing_objects
-    obj = TestObject.new(external_id: 'somefakeid')
-    obj.expects(:update).returns(true)
-    obj.save
-  end
-
-  def test_create_on_saving_new_objects
-    obj = TestObject.new
-    obj.expects(:create).returns(true)
-    obj.save
-  end
-
   def test_field_translation_when_creating_from_remote_source
     obj = TestObject.build({Id: 'somefakeid'}, translate: true)
     assert_equal obj.external_id, 'somefakeid'
@@ -68,17 +56,14 @@ class SObjectTest < Minitest::Test
 
   def test_usage_of_remote_attributes_when_updating
     TestObject.stubs(:client).returns(stub(update!: true))
-    obj = TestObject.build({external_id: 'somefakeid', my_field1: 'myvalue'})
+    obj = TestObject.new({external_id: 'somefakeid', my_field1: 'myvalue'})
     obj.expects(:remote_attributes)
-    obj.save
+    obj.update!
   end
 
   def test_usage_of_remote_attributes_when_creating
-    TestObject.stubs(:client).returns(stub(create!: true))
-    TestObject.stubs(:find).returns(stub(external_id: 'somefakeid'))
-    obj = TestObject.build({my_field1: 'myvalue'})
-    obj.expects(:remote_attributes)
-    obj.save
+    TestObject.stubs(:client).returns(stub(create!: TestObject.new(external_id: 'somefakeid')))
+    TestObject.create!({my_field1: 'myvalue'})
   end
 
   # querying
