@@ -5,7 +5,7 @@ module SObject
 
     def initialize
       @salesforce_namespace = ''
-      @salesforce_client = -> { Restforce.new }
+      @salesforce_client = nil
     end
   end
 end
