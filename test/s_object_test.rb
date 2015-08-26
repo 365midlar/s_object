@@ -47,7 +47,7 @@ class SObjectTest < Minitest::Test
     assert_equal TestObject.new(attributes).attributes, attributes
   end
 
-  def test_field_assignment
+  def test_field_assignment_on_init
     attributes = { external_id: 'somefakeid', my_field1: 'foo', my_field2: 'bar' }
     obj = TestObject.new(attributes)
     assert_equal attributes, obj.attributes
@@ -62,14 +62,17 @@ class SObjectTest < Minitest::Test
 
   def test_usage_of_remote_attributes_when_updating
     TestObject.stubs(:client).returns(stub(update!: true))
-    obj = TestObject.new({external_id: 'somefakeid', my_field1: 'myvalue'})
+    obj = TestObject.new({external_id: 'somefakeid'})
     obj.expects(:remote_attributes)
-    obj.update!
+    obj.update!({my_field1: 'myvalue'})
+    obj.attributes({external_id: 'somefakeid', my_field1: 'myvalue', my_field2: nil})
   end
 
   def test_usage_of_remote_attributes_when_creating
-    TestObject.stubs(:client).returns(stub(create!: TestObject.new(external_id: 'somefakeid')))
-    TestObject.create!({my_field1: 'myvalue'})
+    TestObject.stubs(:client).returns(stub(create!: 'somefakeid'))
+    obj = TestObject.create!({my_field1: 'myvalue'})
+    attributes = {external_id: 'somefakeid', my_field1: 'myvalue', my_field2: nil}
+    assert_equal attributes, obj.attributes
   end
 
   # querying
