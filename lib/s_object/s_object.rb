@@ -43,8 +43,8 @@ module SObject
     end
 
     def assign_attributes(attributes={})
-      attributes.each do |k,v|
-        send(:"#{k}=", v) if self.class.local_fields.keys.include?(k)
+      attributes.symbolize_keys.each do |k,v|
+        send(:"#{k.to_s}=", v) if self.class.local_fields.keys.include?(k)
       end
     end
 

@@ -47,9 +47,18 @@ class SObjectTest < Minitest::Test
     assert_equal TestObject.new(attributes).attributes, attributes
   end
 
-  def test_field_assignment_on_init
+  def test_field_assignment_on_init_with_symbols
     attributes = { external_id: 'somefakeid', my_field1: 'foo', my_field2: 'bar' }
-    obj = TestObject.new(attributes)
+    obj = TestObject.new
+    obj.assign_attributes(attributes)
+    assert_equal attributes, obj.attributes
+  end
+
+  def test_field_assignment_on_init_with_strings
+    attributes = { external_id: 'somefakeid', my_field1: 'foo', my_field2: 'bar' }
+    str_attributes = { 'external_id' => 'somefakeid', 'my_field1' => 'foo', 'my_field2' => 'bar' }
+    obj = TestObject.new
+    obj.assign_attributes(str_attributes)
     assert_equal attributes, obj.attributes
   end
 
