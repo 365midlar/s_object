@@ -99,12 +99,11 @@ module SObject
     # @option options [Boolean] :custom If this is +true+, then +__c+ will be added to the name, unless it's already been added.
     def self.maps_object(name, options={})
       self.s_object_name = "#{name}"
-      self.s_object_api_name = "#{name}"
+      self.s_object_api_name = "#{options[:api_name] || s_object_name}"
 
       # override with custom settings
       if options[:custom]
-        self.s_object_name = "#{self.s_object_name}__c"
-        self.s_object_api_name = "#{options[:api_name] || s_object_name}__c"
+        self.s_object_api_name = "#{self.s_object_api_name}__c" unless self.s_object_api_name.end_with?('__c')
       end
     end
 

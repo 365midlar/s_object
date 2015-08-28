@@ -10,6 +10,10 @@ class SObjectTest < Minitest::Test
     maps_custom_field(:my_field2, :MyField2)
   end
 
+  class NewTestObject < SObject::SObject
+    maps_custom_object('NewTestObject', api_name: 'TestObject2')
+  end
+
   # mapping relationships
 
   class Child < SObject::SObject
@@ -24,6 +28,14 @@ class SObjectTest < Minitest::Test
 
   def test_that_it_has_a_version_number
     refute_nil ::SObject::VERSION
+  end
+
+  # object mapping
+
+  def test_sobject_api_name
+    assert_respond_to NewTestObject, :s_object_api_name
+    assert_equal 'TestObject2__c', NewTestObject.s_object_api_name
+    assert_equal 'NewTestObject', NewTestObject.s_object_name
   end
 
   # field mapping
