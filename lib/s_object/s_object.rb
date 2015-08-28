@@ -2,6 +2,7 @@ module SObject
   # This class is inherited by objects which will reflect a given Salesforce object. Defined using DSL methods you can configure which Salesforce object, fields, and relationships are reflected.
   class SObject
     class << self; attr_accessor :s_object_name end
+    class << self; attr_accessor :s_object_api_name end
 
     def initialize(*args)
       # make sure we have a valid object name
@@ -21,19 +22,19 @@ module SObject
     # Saves this record to salesforce
     def save
       if new_record?
-        self.external_id = self.class.client.create(self.class.s_object_name, remote_attributes)
+        self.external_id = self.class.client.create(self.class.s_object_api_name, remote_attributes)
         return !self.external_id.blank?
       else
-        return self.class.client.update(self.class.s_object_name, remote_attributes)
+        return self.class.client.update(self.class.s_object_api_name, remote_attributes)
       end
     end
 
     def save!
       if new_record?
-        self.external_id = self.class.client.create!(self.class.s_object_name, remote_attributes)
+        self.external_id = self.class.client.create!(self.class.s_object_api_name, remote_attributes)
         return !self.external_id.blank?
       else
-        self.class.client.update!(self.class.s_object_name, remote_attributes)
+        self.class.client.update!(self.class.s_object_api_name, remote_attributes)
       end
     end
 
@@ -100,7 +101,9 @@ module SObject
       self.s_object_name = "#{name}"
 
       if options[:custom]
-        self.s_object_name = "#{self.s_object_name}__c"
+        self.s_object_api_name = "#{self.s_object_name}__c"
+      else
+        self.s_object_api_name = "#{name}"
       end
     end
 
@@ -219,7 +222,7 @@ module SObject
     # Find a record in Salesforce.
     # @param external_id [String] The record Id in Salesforce.
     def self.find(external_id)
-      self.new(client.find(s_object_name, external_id).to_h.symbolize_keys, { translate: true })
+      self.new(client.find(s_object_api_name, external_id).to_h.symbolize_keys, { translate: true })
     end
 
     # Find a record in Salesforce which satisfy the given conditions.
@@ -232,7 +235,7 @@ module SObject
     # @param conditions [Hash] The query conditions, where the keys are local field names and the values the constraints.
     def self.where(conditions={})
       client.query("SELECT #{remote_fields.keys.join(',')}
-                    FROM #{s_object_name}
+                    FROM #{s_object_api_name}
                     #{"WHERE #{where_conditions(conditions)}" unless conditions.blank?}")
       .map do |obj|
         self.new(obj.to_h.symbolize_keys, { translate: true })
@@ -241,7 +244,7 @@ module SObject
 
     def self.exists?(conditions={})
       client.query("SELECT Id
-                    FROM #{s_object_name}
+                    FROM #{s_object_api_name}
                     #{"WHERE #{where_conditions(conditions)}" unless conditions.blank?}
                     LIMIT 1")
       .map do |obj|
@@ -305,7 +308,7 @@ module SObject
       conditions = []
       args.map do |k,v|
         unless local_fields.keys.include?(k)
-          raise ArgumentError.new("'#{k}' is not an attribute of #{s_object_name}")
+          raise ArgumentError.new("'#{k}' is not an attribute of #{s_object_api_name}")
         end
         conditions << "#{remote_fields.invert[k]} = '#{v}'" if k
       end
