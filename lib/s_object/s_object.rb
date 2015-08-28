@@ -100,7 +100,7 @@ module SObject
       self.s_object_name = "#{name}"
 
       if options[:custom]
-        self.class.s_object_name = "#{self.s_object_name}__c"
+        self.s_object_name = "#{self.s_object_name}__c"
       end
     end
 
