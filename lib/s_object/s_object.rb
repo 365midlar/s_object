@@ -104,7 +104,7 @@ module SObject
       # override with custom settings
       if options[:custom]
         self.s_object_name = "#{self.s_object_name}__c"
-        self.s_object_api_name = "#{options[:s_object_api_name] || s_object_name}__c"
+        self.s_object_api_name = "#{options[:api_name] || s_object_name}__c"
       end
     end
 
