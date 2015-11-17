@@ -30,6 +30,18 @@ class SObjectTest < Minitest::Test
     refute_nil ::SObject::VERSION
   end
 
+  # utilities
+
+  def test_valid_external_id_with_valid_id
+    assert SObject.valid_external_id?('01tb00000015WRY')
+    assert SObject.valid_external_id?('01tb00000015WRYAA2')
+  end
+
+  def test_valid_external_id_with_invalid_input
+    refute SObject.valid_external_id?('invalidlength')
+    refute SObject.valid_external_id?('~$%/!@')
+  end
+
   # object mapping
 
   def test_sobject_api_name

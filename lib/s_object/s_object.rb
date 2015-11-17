@@ -1,4 +1,8 @@
 module SObject
+  def self.valid_external_id?(external_id)
+    !(/^([A-Za-z0-9]){15}([A-Z0-9]{3})?$/ =~ external_id).nil?
+  end
+
   # This class is inherited by objects which will reflect a given Salesforce object. Defined using DSL methods you can configure which Salesforce object, fields, and relationships are reflected.
   class SObject
     class << self; attr_accessor :s_object_name end
@@ -113,7 +117,7 @@ module SObject
     def self.maps_custom_object(name, options={})
       self.maps_object(name, options.merge({custom: true}))
     end
-  # Adds a new salesforce field this class will reflect. # @param local [Symbol] The name of the instance variable.
+    # Adds a new salesforce field this class will reflect. # @param local [Symbol] The name of the instance variable.
     # @param remote [Symbol] The name of the field in Salesforce.
     # @param options [Hash] The options hash.
     # @option options [Boolean] :custom If this is +true+, then +__c+ , unless it's already been added.
