@@ -1,0 +1,13 @@
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/ClassLength:
+  Exclude:
+    - test/**/*
+    - lib/s_object/s_object.rb
+
+Style/Documentation:
+  Exclude:
+    - spec/**/*
+    - test/**/*
+    - lib/s_object/version.rb

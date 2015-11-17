@@ -1,0 +1,12 @@
+"lib":
+  Attribute:
+    enabled: false
+"test":
+  IrresponsibleModule:
+    enabled: false
+  DuplicateMethodCall:
+    max_calls: 3
+  UtilityFunction:
+    enabled: false
+  TooManyStatements:
+    max_statements: 10

@@ -1,10 +1,11 @@
 module SObject
+  # SObject Configuration class for setting client and custom namespace
   class Configuration
-    attr_accessor :salesforce_namespace
+    attr_accessor :namespace
     attr_accessor :salesforce_client
 
     def initialize
-      @salesforce_namespace = ''
+      @namespace = ''
       @salesforce_client = -> { Restforce.new }
     end
   end
