@@ -315,7 +315,7 @@ module SObject
           raise ArgumentError.new("'#{k}' is not an attribute of #{s_object_api_name}")
         end
         # Dont put v in quotes if it is a Boolean
-        v = if (!!v == v ? v : "'#{v}'")
+        v = (!!v == v ? v : "'#{v}'")
         # Add the condition
         conditions << "#{remote_fields.invert[k]} = #{v}" if k
       end
